@@ -5,6 +5,18 @@
 
 using namespace Rcpp;
 
+// FindCluster
+DataFrame FindCluster(NumericMatrix ctr, double epsilon);
+RcppExport SEXP _MeanShiftR_FindCluster(SEXP ctrSEXP, SEXP epsilonSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type ctr(ctrSEXP);
+    Rcpp::traits::input_parameter< double >::type epsilon(epsilonSEXP);
+    rcpp_result_gen = Rcpp::wrap(FindCluster(ctr, epsilon));
+    return rcpp_result_gen;
+END_RCPP
+}
 // MeanShift_Classical
 DataFrame MeanShift_Classical(NumericMatrix pc, double H2CW_fac, double H2CL_fac, bool UniformKernel, int MaxIter);
 RcppExport SEXP _MeanShiftR_MeanShift_Classical(SEXP pcSEXP, SEXP H2CW_facSEXP, SEXP H2CL_facSEXP, SEXP UniformKernelSEXP, SEXP MaxIterSEXP) {
@@ -40,6 +52,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_MeanShiftR_FindCluster", (DL_FUNC) &_MeanShiftR_FindCluster, 2},
     {"_MeanShiftR_MeanShift_Classical", (DL_FUNC) &_MeanShiftR_MeanShift_Classical, 5},
     {"_MeanShiftR_MeanShift_Voxels", (DL_FUNC) &_MeanShiftR_MeanShift_Voxels, 8},
     {NULL, NULL, 0}

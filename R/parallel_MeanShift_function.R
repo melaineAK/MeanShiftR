@@ -19,7 +19,7 @@
 #' @author Nikolai Knapp, nikolai.knapp@ufz.de
 
 parallel_MeanShift <- function(pc.list, lib.path=NA, frac.cores=0.5, version="classic", H2CW=0.3, H2CL=0.4,
-                               max.iter=20, buffer.width=10, minz=2, ctr.ac=2){
+                               max.iter=20, buffer.width=10, minz=2, ctr.ac=2, eps=1.0){
 
   # Package requirements
   require(data.table, lib.loc=lib.path)
@@ -110,6 +110,11 @@ parallel_MeanShift <- function(pc.list, lib.path=NA, frac.cores=0.5, version="cl
 
   # Assign IDs to each cluster based on the rounded coordinates
   result.dt[ , ID := .GRP, by = .(RoundCtrX, RoundCtrY, RoundCtrZ)]
+  
+  # other option to merge modes
+  CtrXYZ <- as.matrix(result.dt[,c('CtrX','CtrY','CtrZ')])
+  IDCtr <- FindCluster(Ctr = CtrXYZ, epsilon = eps)
+  result.dt$ID2 <- IDCtr$ID
 
   # Finish
   stopCluster(mycl)

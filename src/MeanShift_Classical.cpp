@@ -49,11 +49,14 @@ DataFrame MeanShift_Classical(NumericMatrix pc, double H2CW_fac, double H2CL_fac
     double verticalweight = 0.0;
     double horizontalweight = 0.0;
     double weight = 0.0;
+    
+    double delta = 0.0;
 
     // Keep iterating as long as the centroid (or the maximum number of iterations) is not reached
     int IterCounter = 0;
     do {
-
+      
+      delta = 0.0;
       sumx = 0.0;
       sumy = 0.0;
       sumz = 0.0;
@@ -105,13 +108,20 @@ DataFrame MeanShift_Classical(NumericMatrix pc, double H2CW_fac, double H2CL_fac
           }
         }
       }
-      meanx = sumx / sump;
-      meany = sumy / sump;
-      meanz = sumz / sump;
+      
+      if (sump>0)
+      {
+        meanx = sumx / sump;
+        meany = sumy / sump;
+        meanz = sumz / sump;
+        
+        delta = sqrt(pow((meanx - oldx),2.0) + pow((meany - oldy),2.0) + pow((meanz - oldz),2.0));
+      }
+
 
     // If the new position equals the previous position (kernel stopped moving), or if the
     // maximum number of iterations is reached, stop the iterations
-    }while(meanx != oldx && meany != oldy && meanz != oldz && IterCounter < MaxIter);
+    }while(delta > 0.001 && IterCounter < MaxIter);
 
     // Store the found position as the centroid position for the focal point
     centroidx[i] = meanx;
