@@ -19,14 +19,16 @@ FindCluster <- function(ctr, epsilon) {
 #' @description
 #' Adaptive mean shift clustering to delineate tree crowns from lidar point clouds
 #' @param pc Point cloud has to be in matrix format with 3-columns representing X, Y and Z and each row representing one point
+#' @param CWInter_fac Intercept for crown width. Determines kernel diameter.
 #' @param H2CW_fac Factor for the ratio of height to crown width. Determines kernel diameter based on its height above ground.
+#' @param CLInter_fac Intercept for crown length. Determines kernel height.
 #' @param H2CL_fac Factor for the ratio of height to crown length. Determines kernel height based on its height above ground.
 #' @param UniformKernel Boolean to enable the application of a simple uniform kernel without distance weighting (Default False)
 #' @param MaxIter Maximum number of iterations, i.e. steps that the kernel can move for each point. If centroid is not found after all iteration, the last position is assigned as centroid and the processing jumps to the next point
 #' @return data.frame with X, Y and Z coordinates of each point in the point cloud and  X, Y and Z coordinates of the centroid to which the point belongs
 #' @export
-MeanShift_Classical <- function(pc, H2CW_fac, H2CL_fac, UniformKernel = FALSE, MaxIter = 20L) {
-    .Call('_MeanShiftR_MeanShift_Classical', PACKAGE = 'MeanShiftR', pc, H2CW_fac, H2CL_fac, UniformKernel, MaxIter)
+MeanShift_Classical <- function(pc, CWInter_fac, H2CW_fac, CLInter_fac, H2CL_fac, UniformKernel = FALSE, MaxIter = 20L) {
+    .Call('_MeanShiftR_MeanShift_Classical', PACKAGE = 'MeanShiftR', pc, CWInter_fac, H2CW_fac, CLInter_fac, H2CL_fac, UniformKernel, MaxIter)
 }
 
 #' Mean shift clustering using a discrete voxel space

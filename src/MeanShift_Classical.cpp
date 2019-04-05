@@ -10,14 +10,16 @@ using namespace Rcpp;
 //' @description
 //' Adaptive mean shift clustering to delineate tree crowns from lidar point clouds
 //' @param pc Point cloud has to be in matrix format with 3-columns representing X, Y and Z and each row representing one point
+//' @param CWInter_fac Intercept for crown width. Determines kernel diameter.
 //' @param H2CW_fac Factor for the ratio of height to crown width. Determines kernel diameter based on its height above ground.
+//' @param CLInter_fac Intercept for crown length. Determines kernel height.
 //' @param H2CL_fac Factor for the ratio of height to crown length. Determines kernel height based on its height above ground.
 //' @param UniformKernel Boolean to enable the application of a simple uniform kernel without distance weighting (Default False)
 //' @param MaxIter Maximum number of iterations, i.e. steps that the kernel can move for each point. If centroid is not found after all iteration, the last position is assigned as centroid and the processing jumps to the next point
 //' @return data.frame with X, Y and Z coordinates of each point in the point cloud and  X, Y and Z coordinates of the centroid to which the point belongs
 //' @export
 // [[Rcpp::export]]
-DataFrame MeanShift_Classical(NumericMatrix pc, double H2CW_fac, double H2CL_fac, bool UniformKernel=false, int MaxIter=20){
+DataFrame MeanShift_Classical(NumericMatrix pc, double CWInter_fac, double H2CW_fac, double CLInter_fac, double H2CL_fac, bool UniformKernel=false, int MaxIter=20){
 
   // Create three vectors that all have the length of the incoming point cloud.
   // In these vectors the coodinates of the centroids will be stored
@@ -49,13 +51,13 @@ DataFrame MeanShift_Classical(NumericMatrix pc, double H2CW_fac, double H2CL_fac
     double verticalweight = 0.0;
     double horizontalweight = 0.0;
     double weight = 0.0;
-    
+
     double delta = 0.0;
 
     // Keep iterating as long as the centroid (or the maximum number of iterations) is not reached
     int IterCounter = 0;
     do {
-      
+
       delta = 0.0;
       sumx = 0.0;
       sumy = 0.0;
@@ -66,9 +68,9 @@ DataFrame MeanShift_Classical(NumericMatrix pc, double H2CW_fac, double H2CL_fac
       IterCounter = IterCounter + 1;
 
       // Calculate cylinder dimensions based on point height
-      double r = H2CW_fac * meanz * 0.5;
-      double d = H2CW_fac * meanz;
-      double h = H2CL_fac * meanz;
+      double d = CWInter_fac + H2CW_fac * meanz;
+      double r = d * 0.5;
+      double h = CLInter_fac + H2CL_fac * meanz;
 
       // Remember the coordinate means (kernel position) of previos iteration
        oldx = meanx;
@@ -108,13 +110,13 @@ DataFrame MeanShift_Classical(NumericMatrix pc, double H2CW_fac, double H2CL_fac
           }
         }
       }
-      
+
       if (sump>0)
       {
         meanx = sumx / sump;
         meany = sumy / sump;
         meanz = sumz / sump;
-        
+
         delta = sqrt(pow((meanx - oldx),2.0) + pow((meany - oldy),2.0) + pow((meanz - oldz),2.0));
       }
 
